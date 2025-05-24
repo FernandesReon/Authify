@@ -159,4 +159,46 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("Welcome email sending failed after account verification");
         }
     }
+
+    // Reset Password
+    @Override
+    public void sendResetOtp(String email) {
+        User existingUser = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("User not found for email: " + email));
+
+        String otp = generateOtp();
+        long expiryTime = System.currentTimeMillis() + (15 * 60 * 1000);
+
+        existingUser.setResetOtp(otp);
+        existingUser.setResetOtpExpireAt(expiryTime);
+
+        userRepository.save(existingUser);
+
+        try {
+            emailService.sendResetOtpEmail(existingUser.getEmail(), otp);
+        }
+        catch (Exception e){
+            throw new RuntimeException("Unable to send email");
+        }
+    }
+
+    @Override
+    public void resetPassword(String email, String otp, String newPassword) {
+        User existingUser = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("User not found for email: " + email));
+
+        if (existingUser.getResetOtp() == null || !existingUser.getResetOtp().equals(otp)){
+            throw new InvalidOTPException("Invalid OTP");
+        }
+
+        if (existingUser.getResetOtpExpireAt() < System.currentTimeMillis()){
+            throw new OTPExpiredException("OTP has expired");
+        }
+
+        existingUser.setPassword(passwordEncoder.encode(newPassword));
+        existingUser.setResetOtp(null);
+        existingUser.setResetOtpExpireAt(0L);
+
+        userRepository.save(existingUser);
+    }
 }

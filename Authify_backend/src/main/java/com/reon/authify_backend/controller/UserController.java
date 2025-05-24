@@ -76,4 +76,28 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to send verification OTP.");
         }
     }
+
+    // reset password (login)
+    @PostMapping("/send-reset-otp")
+    public void sendResetOtp(@RequestParam String email) {
+        try {
+            logger.info("Controller :: Sending OTP for email: " + email);
+            userService.sendResetOtp(email);
+            logger.info("Controller :: Reset OTP send successfully.");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @PostMapping("/reset-password")
+    public void resetPassword(@Valid @RequestBody ResetPasswordDTO resetPassword) {
+        try {
+            logger.info("Controller :: Incoming request for changing password from email: " + resetPassword.getEmail());
+            userService.resetPassword(resetPassword.getEmail(), resetPassword.getOtp(), resetPassword.getNewPassword());
+            logger.info("Controller :: Password reset successful.");
+        } catch (Exception e) {
+            logger.error("Controller :: Unexpected error occurred: " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
 }

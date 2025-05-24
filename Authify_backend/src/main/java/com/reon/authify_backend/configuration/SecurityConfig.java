@@ -37,7 +37,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/user/register", "/user/login",
-                                "/user/verify-account", "/user/resend-verification").permitAll()
+                                "/user/verify-account", "/user/resend-verification",
+                                "/user/send-reset-otp", "/user/reset-password").permitAll()
                         .requestMatchers("admin/**").hasRole("ADMIN"))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .logout(AbstractHttpConfigurer :: disable);
