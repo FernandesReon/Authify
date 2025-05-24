@@ -3,6 +3,8 @@ package com.reon.authify_backend.exception;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -45,6 +47,26 @@ public class GlobalExceptionHandler {
         logger.info("User exception: " + exception.getMessage());
         Map<String, String> error = new HashMap<>();
         error.put("message", "This operation is not allowed.");
+        return ResponseEntity.badRequest().body(error);
+    }
+
+    // Handles cases when email or password is wrong
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<Map<String, Object>> handleBadCredentialException(BadCredentialsException exception){
+        logger.info("BadCredentials exception: " + exception.getMessage());
+        Map<String, Object> error = new HashMap<>();
+        error.put("error", "true");
+        error.put("message", "Email or Password is incorrect.");
+        return ResponseEntity.badRequest().body(error);
+    }
+
+    // Handles cases when the user account is disabled.
+    @ExceptionHandler(DisabledException.class)
+    public ResponseEntity<Map<String, Object>> handleDisableException(DisabledException exception){
+        logger.info("Disabled exception: " + exception.getMessage());
+        Map<String, Object> error = new HashMap<>();
+        error.put("error", "true");
+        error.put("message", "Account is disabled.");
         return ResponseEntity.badRequest().body(error);
     }
 }
