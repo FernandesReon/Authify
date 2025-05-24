@@ -69,4 +69,20 @@ public class GlobalExceptionHandler {
         error.put("message", "Account is disabled.");
         return ResponseEntity.badRequest().body(error);
     }
+
+    @ExceptionHandler(InvalidOTPException.class)
+    public ResponseEntity<Map<String, String>> handleInvalidOTPException(InvalidOTPException invalidOTP) {
+        logger.info("Invalid OTP exception: " + invalidOTP.getMessage());
+        Map<String, String> error = new HashMap<>();
+        error.put("otp", "OTP is invalid. Request for new OTP.");
+        return ResponseEntity.badRequest().body(error);
+    }
+
+    @ExceptionHandler(OTPExpiredException.class)
+    public ResponseEntity<Map<String, String>> handleOTPExpiredException(OTPExpiredException otpExpiredException) {
+        logger.info("OTP Expired Exception: " + otpExpiredException.getMessage());
+        Map<String, String> error = new HashMap<>();
+        error.put("otp", "OTP as expired.");
+        return ResponseEntity.badRequest().body(error);
+    }
 }

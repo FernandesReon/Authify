@@ -8,4 +8,7 @@ public interface UserService {
     UserResponseDTO fetchByEmail(String email);
     JwtAuthenticationResponse authenticateUser(UserLoginDTO loginDTO);
 
+    // account verification
+    void accountVerificationOtp(String email);
+    void verifyAccount(String email, String otp);
 }

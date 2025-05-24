@@ -35,7 +35,9 @@ public class SecurityConfig {
         security.cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer :: disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/user/register", "/user/login").permitAll()
+                        .requestMatchers(
+                                "/user/register", "/user/login",
+                                "/user/verify-account", "/user/resend-verification").permitAll()
                         .requestMatchers("admin/**").hasRole("ADMIN"))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .logout(AbstractHttpConfigurer :: disable);

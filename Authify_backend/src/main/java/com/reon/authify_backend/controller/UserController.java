@@ -48,4 +48,32 @@ public class UserController {
             throw new RuntimeException(e);
         }
     }
+
+    // Account Verification
+    @PostMapping("/verify-account")
+    public ResponseEntity<String> verifyAccount(@RequestParam String email,
+                                                @Valid @RequestBody VerifyAccount verifyAccount) {
+        try {
+            logger.info("Controller :: Verifying account for email: " + email);
+            userService.verifyAccount(email, verifyAccount.getOtp());
+            logger.info("Controller :: Account verification successful.");
+            return ResponseEntity.ok("Account verified successfully. You may now log in.");
+        } catch (Exception e) {
+            logger.error("Controller :: Account verification failed for email: " + email + " - " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/resend-verification")
+    public ResponseEntity<String> resendVerificationOtp(@RequestParam String email) {
+        try {
+            logger.info("Controller :: Resending verification OTP to: " + email);
+            userService.accountVerificationOtp(email);
+            logger.info("Controller :: OTP sent successfully.");
+            return ResponseEntity.ok("Verification OTP has been sent.");
+        } catch (Exception e) {
+            logger.error("Controller :: Failed to resend verification OTP to: " + email + " - " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to send verification OTP.");
+        }
+    }
 }
