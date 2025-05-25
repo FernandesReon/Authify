@@ -5,6 +5,7 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
@@ -41,6 +42,14 @@ public class JwtUtils {
         String bearerToken = request.getHeader("Authorization");
         if (bearerToken != null && bearerToken.startsWith("Bearer")){
             return bearerToken.substring(7);
+        }
+
+        if (request.getCookies() != null){
+            for (Cookie cookie : request.getCookies()){
+                if ("jwt".equals(cookie.getName())){
+                    return cookie.getValue();
+                }
+            }
         }
         return null;
     }

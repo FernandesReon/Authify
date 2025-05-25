@@ -3,10 +3,7 @@ package com.reon.authify_backend.service.impl;
 import com.reon.authify_backend.dto.UserLoginDTO;
 import com.reon.authify_backend.dto.UserRegistrationDTO;
 import com.reon.authify_backend.dto.UserResponseDTO;
-import com.reon.authify_backend.exception.EmailAlreadyExistsException;
-import com.reon.authify_backend.exception.InvalidOTPException;
-import com.reon.authify_backend.exception.OTPExpiredException;
-import com.reon.authify_backend.exception.UserNotFoundException;
+import com.reon.authify_backend.exception.*;
 import com.reon.authify_backend.jwt.JwtAuthenticationResponse;
 import com.reon.authify_backend.jwt.JwtUtils;
 import com.reon.authify_backend.mapper.UserMapper;
@@ -104,6 +101,46 @@ public class UserServiceImpl implements UserService {
         } catch (AuthenticationException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public UserResponseDTO updateUser(String id, UserRegistrationDTO update) {
+        User user = userRepository.findById(id).orElseThrow(
+                () -> new UserNotFoundException("User with id: " + id + " not found.")
+        );
+
+        logger.info("Service :: Updating user with id: " + id);
+
+        if (update.getEmail() != null && !update.getEmail().isBlank()){
+            throw new RestrictionException("Updating email address is not allowed");
+        }
+
+        try {
+            UserMapper.applyUpdates(user, update);
+            user.preUpdate();
+            User updatedUser = userRepository.save(user);
+            logger.info("Service :: User with id: " + id + " updated successfully.");
+            return UserMapper.responseToUser(updatedUser);
+        } catch (Exception e) {
+            logger.error("Service :: Unexpected error occurred while updating user with id: " + id, e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void deleteUser(String userId) {
+        logger.warn("Service :: Incoming request for deleting user with id: " + userId);
+        userRepository.deleteById(userId);
+        logger.info("Service :: Deleted user with id: " + userId);
+    }
+
+    @Override
+    public boolean isUserAuthorized(String id) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String authenticatedEmail = authentication.getName();
+        User authenticatedUser = userRepository.findByEmail(authenticatedEmail).
+                orElseThrow(() -> new UserNotFoundException("Authenticated user not found: " + authenticatedEmail));
+        return authenticatedUser.getId().equals(id);
     }
 
     private String generateOtp() {

@@ -34,4 +34,14 @@ public class UserMapper {
         response.setUpdatedOn(user.getUpdatedOn());
         return response;
     }
+
+    public static void applyUpdates(User user, UserRegistrationDTO existingUser){
+        if (existingUser.getName() != null && !existingUser.getName().isBlank()){
+            user.setName(existingUser.getName());
+        }
+
+        if (existingUser.getPassword() != null && !existingUser.getPassword().isBlank()){
+            user.setPassword(existingUser.getPassword());
+        }
+    }
 }

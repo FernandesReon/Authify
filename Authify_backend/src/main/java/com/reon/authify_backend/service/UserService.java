@@ -7,6 +7,9 @@ public interface UserService {
     UserResponseDTO registration(UserRegistrationDTO register);
     UserResponseDTO fetchByEmail(String email);
     JwtAuthenticationResponse authenticateUser(UserLoginDTO loginDTO);
+    UserResponseDTO updateUser(String id, UserRegistrationDTO update);
+    void deleteUser(String userId);
+    boolean isUserAuthorized(String id);
 
     // account verification
     void accountVerificationOtp(String email);
