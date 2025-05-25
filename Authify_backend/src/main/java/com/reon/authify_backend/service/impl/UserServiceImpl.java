@@ -69,16 +69,6 @@ public class UserServiceImpl implements UserService {
         return UserMapper.responseToUser(saveUser);
     }
 
-    @Override
-    public UserResponseDTO fetchByEmail(String email) {
-        logger.info("Service :: Fetching user by email address: " + email);
-
-        User user = userRepository.findByEmail(email).orElseThrow(
-                () -> new UserNotFoundException("User with email: " + email + " not found.")
-        );
-        return UserMapper.responseToUser(user);
-    }
-
     // Authenticate user using email and password
     @Override
     public JwtAuthenticationResponse authenticateUser(UserLoginDTO loginDTO) {

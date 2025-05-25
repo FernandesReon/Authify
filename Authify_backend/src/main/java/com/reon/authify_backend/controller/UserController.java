@@ -85,6 +85,7 @@ public class UserController {
     }
 
     @DeleteMapping("/delete/id/{id}")
+    @PreAuthorize("@userServiceImpl.isUserAuthorized(#id)")
     public ResponseEntity<Void> deleteUser(@PathVariable String id){
         logger.warn("Controller :: Incoming request for deleting user with id: " + id);
         userService.deleteUser(id);

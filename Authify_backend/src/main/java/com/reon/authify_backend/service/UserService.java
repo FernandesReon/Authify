@@ -5,7 +5,6 @@ import com.reon.authify_backend.jwt.JwtAuthenticationResponse;
 
 public interface UserService {
     UserResponseDTO registration(UserRegistrationDTO register);
-    UserResponseDTO fetchByEmail(String email);
     JwtAuthenticationResponse authenticateUser(UserLoginDTO loginDTO);
     UserResponseDTO updateUser(String id, UserRegistrationDTO update);
     void deleteUser(String userId);
