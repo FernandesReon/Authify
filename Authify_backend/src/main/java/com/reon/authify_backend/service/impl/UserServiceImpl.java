@@ -13,6 +13,9 @@ import com.reon.authify_backend.service.EmailService;
 import com.reon.authify_backend.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -43,6 +46,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @CacheEvict(value = "userList", allEntries = true)
     public UserResponseDTO registration (UserRegistrationDTO register) {
         if (userRepository.existsByEmail(register.getEmail())){
             throw new EmailAlreadyExistsException("User with email: " + register.getEmail() + " already exists");
@@ -94,6 +98,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Caching(
+            put = @CachePut(value = "user", key = "#id"),
+            evict = @CacheEvict(value = "userList", allEntries = true)
+    )
     public UserResponseDTO updateUser(String id, UserRegistrationDTO update) {
         User user = userRepository.findById(id).orElseThrow(
                 () -> new UserNotFoundException("User with id: " + id + " not found.")
@@ -118,6 +126,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @CacheEvict(
+            value = {"users", "userList"},
+            key = "#userId",
+            allEntries = true
+    )
     public void deleteUser(String userId) {
         logger.warn("Service :: Incoming request for deleting user with id: " + userId);
         userRepository.deleteById(userId);
@@ -161,6 +174,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @CacheEvict(
+            value = "users",
+            key = "#email"
+    )
     public void verifyAccount(String email, String otp) {
         User existingUser = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("User not found for email: " + email));
@@ -210,6 +227,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @CacheEvict(
+            value = "users",
+            key = "#email"
+    )
     public void resetPassword(String email, String otp, String newPassword) {
         User existingUser = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("User not found for email: " + email));

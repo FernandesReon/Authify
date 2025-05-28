@@ -9,6 +9,8 @@ import com.reon.authify_backend.repository.UserRepository;
 import com.reon.authify_backend.service.AdminService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -25,6 +27,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    @Cacheable(value = "userList", key = "'page_' + #pageNo + '_' + #pageSize")
     public Page<UserResponseDTO> fetchAllUsers(int pageNo, int pageSize) {
         Pageable pageable = PageRequest.of(pageNo - 1, pageSize);
         Page<User> users = userRepository.findAll(pageable);
@@ -32,6 +35,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    @Cacheable(value = "user", key = "#id")
     public UserResponseDTO fetchUserById(String id) {
         logger.info("Service :: Fetching user by id: " + id);
 
@@ -42,6 +46,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    @Cacheable(value = "user", key = "#email")
     public UserResponseDTO fetchUserByEmail(String email) {
         logger.info("Service :: Fetching user by email address: " + email);
 
@@ -52,6 +57,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    @CacheEvict(value = {"users", "userList"}, key = "#id", allEntries = true)
     public UserResponseDTO updateUserRole(String id, Role role) {
         try {
             logger.info("Service :: Accessing Administrative functionality for promoting a User with id: " + id);
