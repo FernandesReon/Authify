@@ -16,5 +16,6 @@ public interface UserService {
 
     // reset password
     void sendResetOtp(String email);
+    void verifyResetOtp(String email, String otp);
     void resetPassword(String email, String otp, String newPassword);
 }

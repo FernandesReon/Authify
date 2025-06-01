@@ -20,7 +20,7 @@ public class AdminController {
         this.adminService = adminService;
     }
 
-    @GetMapping
+    @GetMapping("/users")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Page<UserResponseDTO>> fetchUsers(
             @RequestParam(defaultValue = "0") int page,

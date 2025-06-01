@@ -20,6 +20,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,6 +28,7 @@ import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -90,8 +92,15 @@ public class UserServiceImpl implements UserService {
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
             String jwt = jwtUtils.generateToken((User) userDetails);
 
+            String roles = userDetails.getAuthorities().stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .collect(Collectors.joining(", "));
+
+            String email = userDetails.getUsername();
+            String name = ((User) userDetails).getName();
+
             // return the token
-            return new JwtAuthenticationResponse(jwt);
+            return new JwtAuthenticationResponse(jwt, email, roles, name);
         } catch (AuthenticationException e) {
             throw new RuntimeException(e);
         }
@@ -223,6 +232,19 @@ public class UserServiceImpl implements UserService {
         }
         catch (Exception e){
             throw new RuntimeException("Unable to send email");
+        }
+    }
+    @Override
+    public void verifyResetOtp(String email, String otp) {
+        User existingUser = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("User not found for email: " + email));
+
+        if (existingUser.getResetOtp() == null || !existingUser.getResetOtp().equals(otp)) {
+            throw new InvalidOTPException("Invalid OTP");
+        }
+
+        if (existingUser.getResetOtpExpireAt() < System.currentTimeMillis()) {
+            throw new OTPExpiredException("OTP has expired");
         }
     }
 

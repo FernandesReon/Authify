@@ -39,12 +39,13 @@ public class SecurityConfig {
         security.cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer :: disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/user/register", "/user/login",
+                        .requestMatchers("/user/register", "/user/login",
                                 "/user/verify-account", "/user/resend-verification",
-                                "/user/send-reset-otp", "/user/reset-password").permitAll()
-                        .requestMatchers("admin/**").hasRole("ADMIN")
-                        .requestMatchers("/user/update/**", "/user/delete/**").authenticated())
+                                "/user/send-reset-otp", "/user/reset-password",
+                                "/user/verify-reset-otp").permitAll()
+                        .requestMatchers("/user/update/**", "/user/delete/**",
+                                "user/profile", "/user/logout").authenticated()
+                        .requestMatchers("/admin/**").hasRole("ADMIN"))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .logout(AbstractHttpConfigurer :: disable);
