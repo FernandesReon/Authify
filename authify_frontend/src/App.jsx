@@ -1,35 +1,35 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { Route, Routes } from "react-router-dom";
+import HomePage from "./pages/HomePage";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
+import VerifyAccount from "./components/VerifyAccount";
+import { Toaster } from "react-hot-toast";
+import ForgotPassword from "./components/ForgotPassword";
+import ResetPasswordOTP from "./components/ResetPasswordOTP";
+import NewPassword from "./components/NewPassword.jsx";
+import UserProfile from "./pages/UserProfile.jsx";
+import AdminDashboard from "./pages/AdminDashboard.jsx";
 
 function App() {
-  const [count, setCount] = useState(0)
+    return (
+        <div className="app-container">
+            <Toaster position="top-right" reverseOrder={false} />
+            <Routes>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/register" element={<RegisterPage />} />
+                <Route path="/verify-account" element={<VerifyAccount />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route path="/forgot-otp" element={<ResetPasswordOTP />} />
+                <Route path="/new-password" element={<NewPassword />} />
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+                <Route path="/user" element={<UserProfile />} />
+                <Route path="/admin" element={<AdminDashboard />} />
+
+
+            </Routes>
+        </div>
+    );
 }
 
-export default App
+export default App;

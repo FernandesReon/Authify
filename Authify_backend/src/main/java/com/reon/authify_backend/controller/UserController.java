@@ -64,7 +64,7 @@ public class UserController {
                 cookie.setSecure(false);
                 cookie.setPath("/");
                 cookie.setMaxAge(24 * 60 * 60);
-                cookie.setAttribute("SameSite", "None");
+                cookie.setAttribute("SameSite", "Strict ");
 
                 response.addCookie(cookie);
                 logger.info("Controller :: Cookie added successfully.");
